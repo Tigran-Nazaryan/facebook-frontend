@@ -1,5 +1,5 @@
 import $api from "@/http";
-import {IAuthResponse, IRegistrationRequest, IUser} from "@/types/types";
+import {IAuthResponse, IRegistrationResponse, IUser} from "@/types/types";
 
 export default class AuthService {
   static async login(email: string, password: string): Promise<IAuthResponse> {
@@ -14,8 +14,8 @@ export default class AuthService {
   }
 
   static async registration(email: string, password: string, firstName: string, lastName: string, birthday?: string, gender?: string):
-    Promise<IRegistrationRequest> {
-    const { data } = await $api.post("/auth/register", {email, password, firstName, lastName, birthday, gender});
+    Promise<IRegistrationResponse> {
+    const { data } = await $api.post<IRegistrationResponse>("/auth/register", {email, password, firstName, lastName, birthday, gender});
 
     return data;
   }
@@ -30,6 +30,15 @@ export default class AuthService {
     if (!data.user) {
       throw new Error("User not verified");
     }
+    return data;
+  }
+
+  static async verifyEmail(token: string) {
+    const { data } = await $api.put(`/auth/verify/${token}`);
+    if (!data.accessToken) {
+      throw new Error("Email verification failed");
+    }
+    $api.setAuthToken(data.accessToken);
     return data;
   }
 }

@@ -1,15 +1,8 @@
-export interface ILoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface IRegistrationRequest {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  birthday?: string;
-  gender?: string;
+export interface IRegistrationResponse {
+  message: string;
+  success: boolean;
+  accessToken: string;
+  user: IUser;
 }
 
 export interface IUser {
@@ -38,7 +31,8 @@ export interface IAuthContextType {
     lastName: string,
     birthday?: string,
     gender?: string
-  ) => Promise<void>;
+  ) => Promise<IRegistrationResponse>;
+  verifyUser: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => void;
   isLoading: boolean;

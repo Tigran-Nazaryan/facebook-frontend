@@ -12,12 +12,13 @@ export default function GeneralLayout({children}: {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuth && !isLoading) {
+    if (!isAuth) {
       router.push("/login");
+      console.log("111111")
     } else {
       redirect("/auth");
     }
-  }, [isAuth, router, isLoading]);
+  }, [isAuth, router]);
 
   if (isLoading || isAuth) {
     return (

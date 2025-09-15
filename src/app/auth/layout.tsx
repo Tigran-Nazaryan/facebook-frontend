@@ -6,7 +6,6 @@ import Header from "@/components/layout/header";
 import {Footer} from "@/components/layout/footer";
 import {useAuth} from "@/store/Auth";
 
-
 export default function DashboardLayout({children}: {
   children: React.ReactNode;
 }) {
@@ -14,12 +13,13 @@ export default function DashboardLayout({children}: {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuth && !isAuth) {
+    if (!isAuth) {
       router.push("/login");
+      console.log('2222222')
     } else {
       router.push("/auth");
     }
-  }, [isAuth, router, isLoading]);
+  }, [isAuth, router]);
 
   if (isLoading) {
     return (

@@ -2,6 +2,8 @@ import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {AuthProvider} from "@/store/Auth";
 
 const geistSans = Geist({
@@ -29,6 +31,7 @@ export default function RootLayout({children}: Readonly<{
     >
     <AuthProvider >
       {children}
+      <ToastContainer position="top-right" autoClose={3000} />
     </AuthProvider>
     </body>
     </html>

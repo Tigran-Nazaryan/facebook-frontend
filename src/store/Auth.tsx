@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, ReactNode, useState, useContext, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { setCookie, getCookie, deleteCookie } from "cookies-next";
+import {createContext, ReactNode, useContext, useEffect, useState} from "react";
+import {useRouter} from "next/navigation";
+import {deleteCookie, getCookie, setCookie} from "cookies-next";
 import $api from "@/http";
 import AuthService from "@/service/authService";
-import { IAuthContextType, IAuthResponse } from "@/types/types";
+import {IAuthContextType, IAuthResponse, IRegistrationResponse} from "@/types/types";
 
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // @ts-ignore
   const registration = async (
     email: string,
     password: string,
@@ -48,12 +49,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     lastName: string,
     birthday?: string,
     gender?: string
-  ) => {
+  ): Promise<IRegistrationResponse> => {
     setIsLoading(true);
     try {
-      await AuthService.registration(email, password, firstName, lastName, birthday, gender);
+      const result =  await AuthService.registration(
+        email,
+        password,
+        firstName,
+        lastName,
+        birthday,
+        gender
+      );
 
-      router.push("/login");
+      setCookie("token", result.accessToken, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 15,
+      });
+
+      $api.setAuthToken(result.accessToken);
+      localStorage.setItem("user", JSON.stringify(result.user));
+
+      setUser(result.user);
+      setIsAuth(true);
+
+      router.push("/auth");
     } catch (e: any) {
       console.error("Registration error:", e.userMessage || e.message);
       throw e;
@@ -61,6 +80,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
     }
   };
+
+
+  const verifyUser = async (token: string) => {
+    try {
+      const result = await AuthService.verifyEmail(token);
+
+      if (result.accessToken) {
+        setCookie("token", result.accessToken, {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 15,
+        });
+
+        $api.setAuthToken(result.accessToken);
+        localStorage.setItem("user", JSON.stringify(result.user));
+
+        setUser(result.user);
+        setIsAuth(true);
+
+        router.push("/auth");
+      } else {
+        console.log("err: no access token in response");
+      }
+    } catch (e: any) {
+      console.log("verify error:", e.message);
+    }
+  };
+
 
   const logout = async () => {
     setIsLoading(true);
@@ -76,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuth(false);
 
       router.push("/login");
+      console.log("44444")
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
@@ -101,6 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setIsAuth(false);
       router.push("/login");
+      console.log("55555")
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +160,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuth, login, registration, logout, checkAuth, isLoading }}
+      value={{ user, isAuth, login, registration, verifyUser, logout, checkAuth, isLoading }}
     >
       {children}
     </AuthContext.Provider>

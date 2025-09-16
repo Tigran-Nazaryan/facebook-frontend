@@ -1,7 +1,7 @@
 "use client";
 
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {deleteCookie, getCookie, setCookie} from "cookies-next";
 import $api from "@/http";
 import AuthService from "@/service/authService";
@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
+  const pathname = usePathname()
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -41,7 +42,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // @ts-ignore
   const registration = async (
     email: string,
     password: string,
@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuth(true);
 
       router.push("/auth");
+      return result;
     } catch (e: any) {
       console.error("Registration error:", e.userMessage || e.message);
       throw e;
@@ -122,7 +123,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuth(false);
 
       router.push("/login");
-      console.log("44444")
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
@@ -147,8 +147,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("Check auth error:", e.message);
       setUser(null);
       setIsAuth(false);
-      router.push("/login");
-      console.log("55555")
+      if (pathname !== '/forgot-password') {
+        router.push("/login");
+      }
     } finally {
       setIsLoading(false);
     }

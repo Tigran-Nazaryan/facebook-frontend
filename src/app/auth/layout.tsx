@@ -15,7 +15,6 @@ export default function DashboardLayout({children}: {
   useEffect(() => {
     if (!isAuth) {
       router.push("/login");
-      console.log('2222222')
     } else {
       router.push("/auth");
     }

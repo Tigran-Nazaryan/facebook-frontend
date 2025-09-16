@@ -14,7 +14,6 @@ export default function GeneralLayout({children}: {
   useEffect(() => {
     if (!isAuth) {
       router.push("/login");
-      console.log("111111")
     } else {
       redirect("/auth");
     }
@@ -30,7 +29,7 @@ export default function GeneralLayout({children}: {
 
   return (
     <>
-      <main className="container mx-auto min-h-screen bg-gray-100">
+      <main className="container mx-auto min-h-screen">
           {children}
       </main>
     </>

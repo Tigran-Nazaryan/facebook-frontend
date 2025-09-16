@@ -16,7 +16,7 @@ export function NavMenu() {
       <div className='w-full'>
         <NavigationMenuList className="w-full">
           <div className='flex justify-between w-full'>
-            <NavigationMenuItem className="w-full flex justify-between">
+            <NavigationMenuItem className="w-full flex">
               <NavigationMenuLink asChild>
                 <Link href="/">Home</Link>
               </NavigationMenuLink>

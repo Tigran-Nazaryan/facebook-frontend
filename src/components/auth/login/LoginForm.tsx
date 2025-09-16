@@ -16,19 +16,15 @@ import Link from "next/link";
 import { useAuth } from "@/store/Auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {LoginFormValues, loginSchema} from "@/components/auth/login/LoginSchema";
+import { LoginFormValues, loginSchema } from "@/components/auth/login/LoginSchema";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const { login } = useAuth();
-
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  });
+  } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
@@ -85,12 +81,22 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-10 sm:h-11 text-sm sm:text-base"
+                  className="w-full h-10 sm:h-11 text-sm sm:text-base cursor-pointer"
                 >
                   {isSubmitting ? "Logging in..." : "Login"}
                 </Button>
               </div>
             </div>
+
+            <div className="mt-2 text-center text-xs sm:text-sm">
+              <Link
+                href="/forgot-password"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                Reset Password
+              </Link>
+            </div>
+
             <div className="mt-4 text-center text-xs sm:text-sm">
               Don&apos;t have an account?{" "}
               <Link

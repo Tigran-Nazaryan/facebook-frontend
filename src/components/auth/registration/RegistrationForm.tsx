@@ -35,7 +35,6 @@ export function RegistrationForm({ className, ...props }: React.ComponentProps<"
   const onSubmit = async (data: RegistrationFormValues) => {
     try {
       const register = await registration(data.email, data.password, data.firstName, data.lastName, data.birthday, data.gender);
-      console.log("result", register);
       toast.success("Registration successful!");
       router.push("/auth");
     } catch (error: any) {
@@ -104,7 +103,6 @@ export function RegistrationForm({ className, ...props }: React.ComponentProps<"
               )}
             </div>
 
-            {/* Radio buttons для выбора пола */}
             <div className="flex flex-col gap-3">
               <Label>Gender</Label>
               <div className="flex gap-4 mt-1">
@@ -134,7 +132,7 @@ export function RegistrationForm({ className, ...props }: React.ComponentProps<"
             </div>
 
             <div className="mt-4">
-              <Button type="submit" disabled={isSubmitting} className="w-full">
+              <Button type="submit" disabled={isSubmitting} className="w-full cursor-pointer">
                 {isSubmitting ? "Registering..." : "Register"}
               </Button>
             </div>

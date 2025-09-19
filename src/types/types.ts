@@ -5,15 +5,6 @@ export interface IRegistrationResponse {
   user: IUser;
 }
 
-export interface IUser {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  birthday?: string;
-  gender?: string;
-}
-
 export interface IAuthResponse {
   accessToken: string;
   tokens: string;
@@ -36,4 +27,45 @@ export interface IAuthContextType {
   logout: () => Promise<void>;
   checkAuth: () => void;
   isLoading: boolean;
+}
+
+export interface IPostData {
+  title?: string;
+  images?: string[];
+}
+
+export interface IProfileData {
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+}
+
+export interface IPostImage {
+  id: number;
+  postId: number;
+  imageUrl: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  coverPhoto?: string;
+  isVerified?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IPost {
+  id: number;
+  authorId?: number;
+  title: string;
+  author?: IUser;
+  images?: IPostImage[];
+  createdAt?: string;
+  updatedAt?: string;
+  likes?: any;
 }

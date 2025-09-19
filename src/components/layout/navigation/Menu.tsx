@@ -25,7 +25,7 @@ export function NavMenu() {
             <div className='flex'>
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
-                  <Link href="/profile" className="whitespace-nowrap">My Profile</Link>
+                  <Link href="/auth/profile" className="whitespace-nowrap">My Profile</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
 

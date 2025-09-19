@@ -4,7 +4,7 @@ import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {usePathname, useRouter} from "next/navigation";
 import {deleteCookie, getCookie, setCookie} from "cookies-next";
 import $api from "@/http";
-import AuthService from "@/service/authService";
+import AuthService from "@/service/auth";
 import {IAuthContextType, IAuthResponse, IRegistrationResponse} from "@/types/types";
 
 const AuthContext = createContext<IAuthContextType | undefined>(undefined);

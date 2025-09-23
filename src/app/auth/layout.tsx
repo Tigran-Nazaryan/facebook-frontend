@@ -13,12 +13,10 @@ export default function DashboardLayout({children}: {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuth) {
+    if (!isLoading && !isAuth) {
       router.push("/login");
-    } else {
-      router.push("/auth");
     }
-  }, [isAuth, router]);
+  }, [isAuth, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -33,7 +31,7 @@ export default function DashboardLayout({children}: {
   return (
     <>
       <Header />
-      <main className="container mx-auto min-h-screen bg-gray-100">
+      <main className="container mx-auto min-h-screen">
         {children}
       </main>
       <Footer />

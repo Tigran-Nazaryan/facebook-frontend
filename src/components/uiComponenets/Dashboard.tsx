@@ -6,20 +6,32 @@ import Header from "@/components/layout/header";
 import {Footer} from "@/components/layout/footer";
 import {useAuth} from "@/store/Auth";
 
-
 export default function DashboardLayout({children}: {
   children: React.ReactNode;
 }) {
-  const { isAuth } = useAuth();
+  const { isAuth, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuth) {
+    if (!isLoading && !isAuth) {
       router.push("/login");
     }
-  }, [isAuth, router]);
+  }, [isAuth, isLoading, router]);
 
-  if (!isAuth) return null;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuth) {
+    return null;
+  }
 
   return (
     <>

@@ -39,6 +39,10 @@ const ProfileService = {
     const response = await $api.delete(`/posts/${postId}/like`);
     return response.data;
   },
+  allPostsUser: async () => {
+    const response = await $api.get(`/profile/posts`);
+    return response.data;
+  },
 
   // editProfile: async (data: IProfileData) => {
   //   const response = await $api.patch("/users", data);

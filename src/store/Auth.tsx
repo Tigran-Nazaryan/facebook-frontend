@@ -12,9 +12,9 @@ const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [isAuth, setIsAuth] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -27,14 +27,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       $api.setAuthToken(data.accessToken);
-      localStorage.setItem("user", JSON.stringify(data.user));
 
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userId", data.user.id.toString());
+      }
       setUser(data.user);
       setIsAuth(true);
 
       router.push("/auth");
     } catch (e: any) {
-
       console.error("Login error:", e.userMessage || e.message);
       throw e;
     } finally {
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<IRegistrationResponse> => {
     setIsLoading(true);
     try {
-      const result =  await AuthService.registration(
+      const result = await AuthService.registration(
         email,
         password,
         firstName,
@@ -67,7 +68,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       $api.setAuthToken(result.accessToken);
-      localStorage.setItem("user", JSON.stringify(result.user));
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userId", result.user.id.toString());
+      }
 
       setUser(result.user);
       setIsAuth(true);
@@ -82,8 +86,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-
   const verifyUser = async (token: string) => {
+    setIsLoading(true);
     try {
       const result = await AuthService.verifyEmail(token);
 
@@ -94,7 +98,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
 
         $api.setAuthToken(result.accessToken);
-        localStorage.setItem("user", JSON.stringify(result.user));
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("userId", result.user.id.toString());
+        }
+
 
         setUser(result.user);
         setIsAuth(true);
@@ -105,9 +113,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (e: any) {
       console.log("verify error:", e.message);
+      throw e;
+    } finally {
+      setIsLoading(false);
     }
   };
-
 
   const logout = async () => {
     setIsLoading(true);
@@ -115,7 +125,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await AuthService.logout();
 
       deleteCookie("token", { path: "/" });
-      localStorage.removeItem("user");
+
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("userId");
+      }
 
       $api.clearAuthToken();
 
@@ -143,11 +156,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(data.user);
       setIsAuth(true);
+
+      localStorage.setItem("userId", data.user.id.toString());
+
     } catch (e: any) {
       console.log("Check auth error:", e.message);
       setUser(null);
       setIsAuth(false);
-      if (pathname !== '/forgot-password') {
+
+      const publicRoutes = ['/forgot-password', '/reset-password', '/verify'];
+      const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+      if (!isPublicRoute) {
         router.push("/login");
       }
     } finally {

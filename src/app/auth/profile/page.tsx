@@ -1,25 +1,28 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import ProfileService from "@/service/profile";
-import { IPost } from "@/types/types";
+import {IPost} from "@/types/types";
 import PostItem from "@/components/uiComponenets/PostItem";
-import { Button } from "@/components/ui/button";
-import CreatePostModal from "@/components/uiComponenets/CreatePostModal";
+import {Button} from "@/components/ui/button";
+import CreatePostModal from "@/components/uiComponenets/createModal/CreatePostModal";
 
 const Profile = () => {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [openModal, setOpenModal] = useState(false);
 
+  const currentUserId = Number(localStorage.getItem("userId"));
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const data = await ProfileService.getAllPosts();
+        const data = await ProfileService.allPostsUser();
         setPosts(data);
       } catch (err: any) {
         console.error(err.userMessage || err.message);
       }
     };
+
     fetchPosts();
   }, []);
 
@@ -30,25 +33,53 @@ const Profile = () => {
       files.forEach((file) => formData.append("images", file));
 
       const newPost = await ProfileService.createPost(formData);
-      setPosts((prev) => [newPost, ...prev]);
+      setPosts(prev => [newPost, ...prev]);
     } catch (err: any) {
       alert(err.userMessage || err.message);
     }
   }, []);
 
   const handleUpdatePost = useCallback((updatedPost: IPost) => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === updatedPost.id ? updatedPost : p))
-    );
+    setPosts(prev => prev.map(p => p.id === updatedPost.id ? updatedPost : p));
   }, []);
 
   const handleDeletePost = useCallback((postId: number) => {
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    setPosts(prev => prev.filter(p => p.id !== postId));
   }, []);
 
+  const handleLikePost = useCallback(async (postId: number, isCurrentlyLiked: boolean) => {
+    try {
+      if (isCurrentlyLiked) {
+        await ProfileService.unLikePost(postId);
+      } else {
+        await ProfileService.likePost(postId);
+      }
+
+      setPosts(prev =>
+        prev.map(post => {
+          if (post.id === postId) {
+            const updatedLikes = isCurrentlyLiked
+              ? post.likes?.filter((like: { userId: number; }) => like.userId !== currentUserId) || []
+              : [...(post.likes || []), {userId: currentUserId, postId}];
+            return {...post, likes: updatedLikes};
+          }
+          return post;
+        })
+      );
+    } catch (err: any) {
+      console.error(err.userMessage || err.message);
+    }
+  }, [currentUserId]);
+
+  const isPostLikedByUser = useCallback((post: IPost) => {
+    return post.likes?.some((like: { userId: number; }) => like.userId === currentUserId) || false;
+  }, [currentUserId]);
+
+  console.log("posts", posts)
+
   return (
-    <div className="px-4">
-      <div className="mb-6 max-w-2xl mx-auto">
+    <div>
+      <div className="mb-6">
         <Button onClick={() => setOpenModal(true)}>+ Create Post</Button>
       </div>
 
@@ -58,15 +89,18 @@ const Profile = () => {
         onCreate={handleCreatePost}
       />
 
-      {posts.map((post) => (
-        <PostItem
-          key={post.id}
-          post={post}
-          onUpdate={handleUpdatePost}
-          onDelete={handleDeletePost}
-          isOwner={true}
-        />
-      ))}
+      <div className="flex justify-between gap-4">
+        {posts.map(post => (
+          <PostItem
+            key={post.id}
+            post={post}
+            onUpdate={handleUpdatePost}
+            onDelete={handleDeletePost}
+            onLike={handleLikePost}
+            isLiked={isPostLikedByUser(post)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

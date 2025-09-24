@@ -18,7 +18,7 @@ export function NavMenu() {
           <div className='flex justify-between w-full'>
             <NavigationMenuItem className="w-full flex">
               <NavigationMenuLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/auth">Home</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
 

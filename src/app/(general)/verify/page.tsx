@@ -21,7 +21,7 @@ export default function VerifyPage() {
       try {
         await verifyUser(token);
         setMessage("Email verified! Redirecting...");
-        console.log("11111")
+        // console.log("11111")
         router.push("/auth");
       } catch (e: any) {
         setMessage("Verification failed: " + e.message);

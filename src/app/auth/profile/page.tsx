@@ -75,8 +75,6 @@ const Profile = () => {
     return post.likes?.some((like: { userId: number; }) => like.userId === currentUserId) || false;
   }, [currentUserId]);
 
-  console.log("posts", posts)
-
   return (
     <div>
       <div className="mb-6">

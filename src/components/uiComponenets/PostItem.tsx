@@ -52,9 +52,7 @@ const PostItem: React.FC<PostItemProps> = ({post, onUpdate, onDelete, onLike, is
         ...updatedPost,
         likes: updatedPost.likes || post.likes,
         author: updatedPost.author || post.author,
-        images: updatedPost.images || post.images
       };
-
 
       onUpdate(postWithPreservedData);
       toast.success("Post updated successfully!");
@@ -117,7 +115,7 @@ const PostItem: React.FC<PostItemProps> = ({post, onUpdate, onDelete, onLike, is
   }
 
   return (
-    <Card className="w-full max-w-2xl mb-6 shadow-lg hover:shadow-xl transition-shadow duration-200">
+    <Card className="w-full mb-6 shadow-lg hover:shadow-xl transition-shadow duration-200  ">
       <CardHeader className="pb-3 flex justify-between items-start">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">

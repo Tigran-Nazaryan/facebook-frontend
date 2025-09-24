@@ -1,24 +1,20 @@
 "use client";
 
-import {useAuth} from "@/store/Auth";
-import {useEffect} from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Home = () => {
-  const {user} = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    if (user && typeof user.isVerified === "boolean") {
-      if (!user.isVerified) {
-        const alreadyShown = sessionStorage.getItem("verify-alert");
-        if (!alreadyShown) {
-          alert("Please activate your account by clicking the link");
-          sessionStorage.setItem("verify-alert", "true");
-        }
-      }
+    if (searchParams.get("justRegistered") === "true") {
+      alert("Registration successful! Confirm your account via email.");
+      router.replace("/auth");
     }
-  }, [user?.isVerified]);
+  }, [searchParams, router]);
 
-  return 123
-}
+  return <div>123</div>;
+};
 
-export default Home
+export default Home;

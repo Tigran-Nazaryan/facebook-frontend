@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import {createPostSchema, FormValues} from "@/components/uiComponenets/createModal/schema";
+import {DialogDescription} from "@radix-ui/react-dialog";
 
 interface CreatePostModalProps {
   open: boolean;
@@ -32,7 +33,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose, onCrea
 
   const onSubmit = (data: FormValues) => {
     try {
-      console.log(data)
       onCreate(data.title, data.files);
       toast.success("Post created successfully!");
       reset();
@@ -48,6 +48,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onClose, onCrea
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
+          <DialogDescription>
+            Fill out the form below to create a new post.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">

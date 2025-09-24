@@ -36,8 +36,8 @@ export function RegistrationForm({ className, ...props }: React.ComponentProps<"
     try {
       const register = await registration(data.email, data.password, data.firstName, data.lastName, data.birthday, data.gender);
       toast.success("Registration successful!");
-      console.log("33333")
-      router.push("/auth");
+      // console.log("33333")
+      router.push("/auth?justRegistered=true");
     } catch (error: any) {
       toast.error("Registration failed: " + error.message);
       console.error("Registration error:", error.message);

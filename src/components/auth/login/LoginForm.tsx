@@ -54,7 +54,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                   placeholder="m@example.com"
                   className="h-10 sm:h-11"
                   {...register("email")}
-                  autoComplete="current-password"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm">{errors.email.message}</p>

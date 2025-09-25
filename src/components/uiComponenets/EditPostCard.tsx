@@ -113,10 +113,10 @@ const EditPostCard: React.FC<EditPostCardProps> = ({ initialTitle, initialImages
       </CardContent>
 
       <CardFooter className="flex justify-end space-x-2 pt-4 border-t">
-        <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
+        <Button variant="outline" className="cursor-pointer" onClick={handleCancel} disabled={isLoading}>
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={isLoading || !title.trim()}>
+        <Button className="cursor-pointer" onClick={handleSave} disabled={isLoading || !title.trim()}>
           {isLoading ? "Saving..." : "Save Changes"}
         </Button>
       </CardFooter>

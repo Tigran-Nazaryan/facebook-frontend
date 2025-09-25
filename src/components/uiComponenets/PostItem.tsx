@@ -142,23 +142,23 @@ const PostItem: React.FC<PostItemProps> = ({post, onUpdate, onDelete, onLike, is
             onClick={() => setIsEditing(true)}
             disabled={isLoading}
           >
-            <Edit2 className="h-4 w-4 text-blue-600"/>
+            <Edit2 className="h-4 w-4 text-blue-600" />
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="sm" disabled={isLoading}>
+              <Button variant="ghost" size="sm" className="cursor-pointer" disabled={isLoading}>
                 <Trash2 className="h-4 w-4 text-red-600"/>
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete Post</AlertDialogTitle>
+                <AlertDialogTitle >Delete Post</AlertDialogTitle>
                 <AlertDialogDescription>
                   Are you sure you want to delete this post? This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel className="cursor-pointer" disabled={isLoading} >Cancel</AlertDialogCancel>
                 <AlertDialogAction asChild>
                   <Button
                     className="cursor-pointer"

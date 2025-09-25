@@ -78,7 +78,7 @@ const Profile = () => {
   return (
     <div>
       <div className="mb-6">
-        <Button onClick={() => setOpenModal(true)}>+ Create Post</Button>
+        <Button onClick={() => setOpenModal(true)} className="cursor-pointer">+ Create Post</Button>
       </div>
 
       <CreatePostModal
@@ -87,16 +87,17 @@ const Profile = () => {
         onCreate={handleCreatePost}
       />
 
-      <div className="flex justify-between gap-4">
+      <div className="grid place-items-center gap-4">
         {posts.map(post => (
-          <PostItem
-            key={post.id}
-            post={post}
-            onUpdate={handleUpdatePost}
-            onDelete={handleDeletePost}
-            onLike={handleLikePost}
-            isLiked={isPostLikedByUser(post)}
-          />
+          <div key={post.id} className="w-full max-w-2xl min-h-[500px]">
+            <PostItem
+              post={post}
+              onUpdate={handleUpdatePost}
+              onDelete={handleDeletePost}
+              onLike={handleLikePost}
+              isLiked={isPostLikedByUser(post)}
+            />
+          </div>
         ))}
       </div>
     </div>

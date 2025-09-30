@@ -1,3 +1,5 @@
+import {Dispatch, SetStateAction} from "react";
+
 export interface IRegistrationResponse {
   message: string;
   success: boolean;
@@ -12,7 +14,7 @@ export interface IAuthResponse {
 }
 
 export interface IAuthContextType {
-  user: any | null;
+  user: IUser | null;
   isAuth: boolean;
   login: (email: string, password: string) => Promise<void>;
   registration: (
@@ -27,11 +29,7 @@ export interface IAuthContextType {
   logout: () => Promise<void>;
   checkAuth: () => void;
   isLoading: boolean;
-}
-
-export interface IPostData {
-  title?: string;
-  images?: string[];
+  setUser?: Dispatch<SetStateAction<IUser | null>>;
 }
 
 export interface IProfileData {
@@ -53,7 +51,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
-  coverPhoto?: string;
+  coverPhoto?: string | null;
   isVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -69,3 +67,9 @@ export interface IPost {
   updatedAt?: string;
   likes?: any;
 }
+
+export type UpdateData = {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+};

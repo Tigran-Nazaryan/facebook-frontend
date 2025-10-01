@@ -73,3 +73,16 @@ export type UpdateData = {
   lastName?: string;
   email?: string;
 };
+
+export interface ISearchResponse {
+  users: IUser[];
+  totalCount: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface PaginationDemoProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}

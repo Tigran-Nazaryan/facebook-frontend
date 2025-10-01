@@ -40,7 +40,6 @@ export function NavMenu() {
     setIsProfileOpen(false);
   };
 
-
   return (
     <nav className="w-full">
       <div className="w-full">

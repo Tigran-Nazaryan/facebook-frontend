@@ -43,11 +43,6 @@ const ProfileService = {
     const response = await $api.get(`/profile/posts`);
     return response.data;
   },
-
-  // editProfile: async (data: IProfileData) => {
-  //   const response = await $api.patch("/users", data);
-  //   return response.data;
-  // },
 };
 
 export default ProfileService;

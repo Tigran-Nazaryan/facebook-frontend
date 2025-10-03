@@ -55,6 +55,9 @@ export interface IUser {
   isVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  friendStatus?: "pending" | "accepted" | "rejected" | null;
+  sentRequest?: IFriendRequest;
+  receivedRequest?: IFriendRequest;
 }
 
 export interface IPost {
@@ -85,4 +88,16 @@ export interface PaginationDemoProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+}
+
+
+export interface IFriendRequest {
+  id: number;
+  firstName: string;
+  lastName: string;
+  senderId: number;
+  receiverId: number | undefined;
+  status: "pending" | "accepted" | "rejected";
+  sender?: IUser;
+  receiver?: IUser;
 }

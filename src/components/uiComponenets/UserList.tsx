@@ -7,9 +7,9 @@ import { useAuth } from "@/store/Auth";
 interface UserListProps {
   users: IUser[];
   onAddFriend: (userId: number) => void;
-  onCancelRequest: (requestId: number) => void;
-  onAcceptRequest: (requestId: number) => void;
-  onRejectRequest: (requestId: number) => void;
+  onCancelRequest: (requestId: number, userId: number) => void;
+  onAcceptRequest: (requestId: number, userId: number) => void;
+  onRejectRequest: (requestId: number, userId: number) => void;
 }
 
 const UserList = ({
@@ -37,40 +37,20 @@ const UserList = ({
           );
         }
 
-        else if (user.receivedRequest && user.receivedRequest.status === 'pending' && user?.id == authUser?.id) {
-
-          const requestId = user.receivedRequest!.id;
-
-          buttonContent = (
-            <div className="flex gap-2">
-              <button
-                onClick={() => onAcceptRequest(requestId)}
-                className="px-3 py-1 rounded-lg bg-green-500 text-white flex items-center gap-1 hover:bg-green-600 transition"
-              >
-                <CheckCircle size={16} /> Accept
-              </button>
-              <button
-                onClick={() => onRejectRequest(requestId)}
-                className="px-3 py-1 rounded-lg bg-red-500 text-white flex items-center gap-1 hover:bg-red-600 transition"
-              >
-                <XCircle size={16} /> Reject
-              </button>
-            </div>
-          );
-        } else if (user.sentRequest && user.sentRequest.status === 'pending' && user?.id != authUser?.id) {
+        else if (user.sentRequest && user.sentRequest.status === 'pending' && user?.id != authUser?.id) {
 
           const requestId = user.sentRequest!.id;
 
           buttonContent = (
             <div className="flex gap-2">
               <button
-                onClick={() => onAcceptRequest(requestId)}
+                onClick={() => onAcceptRequest(requestId, user.id)}
                 className="px-3 py-1 rounded-lg bg-green-500 text-white flex items-center gap-1 hover:bg-green-600 transition"
               >
-                <CheckCircle size={16} /> Accept
+                <CheckCircle size={16} /> Accept879879
               </button>
               <button
-                onClick={() => onRejectRequest(requestId)}
+                onClick={() => onRejectRequest(requestId, user.id)}
                 className="px-3 py-1 rounded-lg bg-red-500 text-white flex items-center gap-1 hover:bg-red-600 transition"
               >
                 <XCircle size={16} /> Reject
@@ -82,20 +62,7 @@ const UserList = ({
 
           buttonContent = (
             <button
-              onClick={() => onCancelRequest(requestId)}
-              className="px-3 py-1 rounded-lg bg-gray-800 text-white flex items-center gap-2 cursor-pointer hover:bg-gray-600 transition"
-            >
-              Pending <XCircle size={16} />
-            </button>
-          );
-        }
-
-        else if (user.sentRequest && (user.sentRequest.status === 'pending' || user.sentRequest.friendStatus === 'pending')) {
-          const requestId = user.sentRequest!.id;
-
-          buttonContent = (
-            <button
-              onClick={() => onCancelRequest(requestId)}
+              onClick={() => onCancelRequest(requestId, user.id)}
               className="px-3 py-1 rounded-lg bg-gray-800 text-white flex items-center gap-2 cursor-pointer hover:bg-gray-600 transition"
             >
               Pending <XCircle size={16} />

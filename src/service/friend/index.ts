@@ -7,16 +7,6 @@ export default class FriendService {
     return data.data;
   }
 
-  static async getReceivedRequests(userId: number): Promise<IFriendRequest[]> {
-    const { data } = await $api.get(`/friend/received/${userId}`);
-    return data.data;
-  }
-
-  static async getSentRequests(userId: number): Promise<IFriendRequest[]> {
-    const { data } = await $api.get(`/friend/sent/${userId}`);
-    return data.data;
-  }
-
   static async acceptRequest(requestId: number): Promise<IFriendRequest> {
     const { data } = await $api.post(`/friend/${requestId}/accept`);
     return data.data;

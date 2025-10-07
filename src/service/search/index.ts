@@ -1,10 +1,21 @@
 import { ISearchResponse } from "@/types/types";
 import $api from "@/http";
 
+interface SearchFilters {
+  filter?: "all" | "received" | "friends";
+}
+
 class SearchService {
-  async searchUsers(query?: string, page: number = 1, limit: number = 10): Promise<ISearchResponse> {
+  async search(
+    query: string = "",
+    page: number = 1,
+    limit: number = 10,
+    filterMode?: string,
+    filters: SearchFilters = {}
+  ): Promise<ISearchResponse> {
     try {
-      const params: any = { page, limit };
+      const params: any = { page, limit, filter: filterMode, ...filters };
+
       if (query && query.trim() !== "") {
         params.q = query.trim();
       }

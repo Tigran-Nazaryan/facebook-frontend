@@ -25,7 +25,7 @@ const Home = () => {
       setCurrentPage(data.currentPage || 1);
       setTotalPages(data.totalPages || 1);
     } catch (err) {
-      console.error("🔴 fetchUsers error:", err);
+      console.error("fetchUsers error:", err);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ const Home = () => {
         )
       );
     } catch (err) {
-      console.error("🔴 Error sending friend request:", err);
+      console.error("Error sending friend request:", err);
     }
   };
 
@@ -71,7 +71,7 @@ const Home = () => {
         )
       );
     } catch (err) {
-      console.error("🔴 Error cancelling request:", err);
+      console.error("Error cancelling request:", err);
     }
   };
 
@@ -101,7 +101,7 @@ const Home = () => {
         )
       );
     } catch (err) {
-      console.error("🔴 Error rejecting request:", err);
+      console.error("Error rejecting request:", err);
     }
   };
 

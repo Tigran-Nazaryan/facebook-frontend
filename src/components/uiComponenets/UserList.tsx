@@ -47,7 +47,7 @@ const UserList = ({
                 onClick={() => onAcceptRequest(requestId, user.id)}
                 className="px-3 py-1 rounded-lg bg-green-500 text-white flex items-center gap-1 hover:bg-green-600 transition"
               >
-                <CheckCircle size={16} /> Accept879879
+                <CheckCircle size={16} /> Accept
               </button>
               <button
                 onClick={() => onRejectRequest(requestId, user.id)}

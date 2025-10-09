@@ -1,23 +1,44 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useParams } from "next/navigation";
+import {useState, useRef, useEffect} from "react";
+import {useForm} from "react-hook-form";
+import {useParams} from "next/navigation";
 import MessageService from "@/service/chat";
-import { IMessage, IFormInput, IMessageFromAPI } from "@/types/types";
-import { useAuth } from "@/store/Auth";
+import {IMessage, IFormInput, IMessageFromAPI} from "@/types/types";
+import {useAuth} from "@/store/Auth";
 
 const MessagePage = () => {
-  const { user } = useAuth();
+  const {user} = useAuth();
   const params = useParams();
   const friendId = Number(params.friendId);
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { register, handleSubmit, reset } = useForm<IFormInput>({
-    defaultValues: { message: "" },
+  const {register, handleSubmit, reset} = useForm<IFormInput>({
+    defaultValues: {message: ""},
   });
 
   const userId = user?.id;
+
+  const isUserAtBottom = () => {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+
+    const threshold = 100;
+    const position = container.scrollHeight - container.scrollTop - container.clientHeight;
+    return position < threshold;
+  };
+
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({behavior});
+  };
+
+  useEffect(() => {
+    if (messages.length > 0 && isUserAtBottom()) {
+      setTimeout(() => scrollToBottom(), 100);
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!userId || !friendId) return;
@@ -33,8 +54,11 @@ const MessagePage = () => {
             isMe: m.senderId === userId,
             text: m.message,
             sender: m.sender,
+            createdAt: m.createdAt,
           }))
         );
+
+        setTimeout(() => scrollToBottom("auto"), 100);
       } catch (err) {
         console.error("Error loading messages:", err);
       }
@@ -57,8 +81,10 @@ const MessagePage = () => {
           isMe: true,
           text: newMsg.message,
           sender: newMsg.sender,
+          createdAt: newMsg.createdAt,
         },
       ]);
+
       reset();
     } catch (err) {
       console.error("Error sending message", err);
@@ -68,12 +94,15 @@ const MessagePage = () => {
   if (!userId || !friendId) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col h-[500px] bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-100">
       <div className="p-4 bg-white shadow-md flex items-center gap-3">
         <h2 className="text-lg font-medium">Chat with Friend</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -87,7 +116,8 @@ const MessagePage = () => {
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full p-6 flex items-center justify-center text-white font-bold text-xl bg-black">
+                <div
+                  className="w-8 h-8 rounded-full p-6 flex items-center justify-center text-white font-bold text-xl bg-black">
                   {msg.sender.firstName?.[0]}
                   {msg.sender.lastName?.[0]}
                 </div>
@@ -101,11 +131,16 @@ const MessagePage = () => {
                   : "bg-white text-gray-800 rounded-bl-none shadow"
               }`}
             >
-              {msg.text}
+              <div>{msg.text}</div>
+              <div className="text-xs text-gray-400 mt-1">
+                <span className="text-xs text-gray-400">
+                  {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                </span>
+              </div>
             </div>
           </div>
         ))}
-        <div/>
+        <div ref={messagesEndRef}/>
       </div>
 
       <form

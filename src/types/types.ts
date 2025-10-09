@@ -118,6 +118,7 @@ export interface IMessage {
   text: string;
   isMe: boolean;
   sender?: IUserShort;
+  createdAt: string;
 }
 
 export interface IFormInput {
@@ -129,5 +130,6 @@ export interface IMessageFromAPI {
   senderId: number;
   receiverId: number;
   message: string;
+  createdAt: string;
   sender?: IUserShort
 }

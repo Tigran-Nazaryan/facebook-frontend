@@ -105,3 +105,29 @@ export interface IFriendRequest {
     coverPhoto?: string | null;
   } | null;
 }
+
+export interface IUserShort {
+  id: number;
+  firstName: string;
+  lastName: string;
+  coverPhoto: string | null;
+}
+
+export interface IMessage {
+  id: number;
+  text: string;
+  isMe: boolean;
+  sender?: IUserShort;
+}
+
+export interface IFormInput {
+  message: string;
+}
+
+export interface IMessageFromAPI {
+  id: number;
+  senderId: number;
+  receiverId: number;
+  message: string;
+  sender?: IUserShort
+}

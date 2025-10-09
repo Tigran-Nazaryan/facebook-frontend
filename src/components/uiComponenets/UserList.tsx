@@ -1,8 +1,10 @@
 "use client";
 
-import { UserPlus, XCircle, CheckCircle } from "lucide-react";
-import { IUser } from "@/types/types";
-import { useAuth } from "@/store/Auth";
+import {UserPlus, XCircle, CheckCircle} from "lucide-react";
+import {IUser} from "@/types/types";
+import {useAuth} from "@/store/Auth";
+import { MdOutlineMessage } from "react-icons/md";
+import {useRouter} from "next/navigation";
 
 interface UserListProps {
   users: IUser[];
@@ -19,11 +21,17 @@ const UserList = ({
                     onAcceptRequest,
                     onRejectRequest,
                   }: UserListProps) => {
+
+  const router = useRouter();
+  const {user: authUser} = useAuth();
+
   if (users.length === 0) {
     return <div className="mt-4 text-center text-gray-500">No users found</div>;
   }
 
-  const {user: authUser} = useAuth();
+  const handleMessageClick = (friendId: number) => {
+    router.push(`/auth/chat/${friendId}`);
+  }
 
   return (
     <ul className="mt-4 flex flex-col gap-4">
@@ -33,11 +41,18 @@ const UserList = ({
 
         if (user.friendStatus === "accepted") {
           buttonContent = (
+          <div className="flex gap-2">
             <span className="px-3 py-1 rounded-lg text-green-600 font-medium">Friend</span>
-          );
-        }
-
-        else if (user.sentRequest && user.sentRequest.status === 'pending' && user?.id != authUser?.id) {
+            <button
+              onClick={() => handleMessageClick(user.id)}
+              className="px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition cursor-pointer"
+            >
+              <MdOutlineMessage />
+            </button>
+          </div>
+        )
+          ;
+        } else if (user.sentRequest && user.sentRequest.status === 'pending' && user?.id != authUser?.id) {
 
           const requestId = user.sentRequest!.id;
 
@@ -47,13 +62,13 @@ const UserList = ({
                 onClick={() => onAcceptRequest(requestId, user.id)}
                 className="px-3 py-1 rounded-lg bg-green-500 text-white flex items-center gap-1 hover:bg-green-600 transition"
               >
-                <CheckCircle size={16} /> Accept
+                <CheckCircle size={16}/> Accept
               </button>
               <button
                 onClick={() => onRejectRequest(requestId, user.id)}
                 className="px-3 py-1 rounded-lg bg-red-500 text-white flex items-center gap-1 hover:bg-red-600 transition"
               >
-                <XCircle size={16} /> Reject
+                <XCircle size={16}/> Reject
               </button>
             </div>
           );
@@ -65,18 +80,16 @@ const UserList = ({
               onClick={() => onCancelRequest(requestId, user.id)}
               className="px-3 py-1 rounded-lg bg-gray-800 text-white flex items-center gap-2 cursor-pointer hover:bg-gray-600 transition"
             >
-              Pending <XCircle size={16} />
+              Pending <XCircle size={16}/>
             </button>
           );
-        }
-
-        else {
+        } else {
           buttonContent = (
             <button
               onClick={() => onAddFriend(user.id)}
               className="flex items-center rounded-lg justify-center gap-2 px-3 py-1 bg-black text-white hover:bg-gray-800 transition cursor-pointer"
             >
-              <UserPlus size={16} />
+              <UserPlus size={16}/>
               Add Friend
             </button>
           );

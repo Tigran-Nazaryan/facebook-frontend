@@ -6,6 +6,9 @@ import {useParams} from "next/navigation";
 import MessageService from "@/service/chat";
 import {IMessage, IFormInput, IMessageFromAPI} from "@/types/types";
 import {useAuth} from "@/store/Auth";
+import {io} from "socket.io-client";
+
+const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
 
 const MessagePage = () => {
   const {user} = useAuth();
@@ -39,6 +42,37 @@ const MessagePage = () => {
       setTimeout(() => scrollToBottom(), 100);
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    socket.emit("joinRoom", userId);
+
+    socket.on("receiveMessage", (data) => {
+      if (data.receiverId === userId) {
+        console.log("Received message", data);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: data.id,
+            isMe: false,
+            text: data.message,
+            sender: data.sender,
+            createdAt: data.createdAt,
+          },
+        ]);
+      }
+    });
+
+    socket.on("messageSent", (data) => {
+      console.log("✅ Message sent:", data);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+      socket.off("messageSent");
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (!userId || !friendId) return;
@@ -92,13 +126,13 @@ const MessagePage = () => {
   };
 
   if (!userId || !friendId) return <p>Loading...</p>;
+  console.log("message", messages);
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <div className="p-4 bg-white shadow-md flex items-center gap-3">
         <h2 className="text-lg font-medium">Chat with Friend</h2>
       </div>
-
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"

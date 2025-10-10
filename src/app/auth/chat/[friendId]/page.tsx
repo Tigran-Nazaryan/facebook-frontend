@@ -1,25 +1,25 @@
 "use client";
 
-import {useState, useRef, useEffect} from "react";
-import {useForm} from "react-hook-form";
-import {useParams} from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useParams } from "next/navigation";
+import { io } from "socket.io-client";
+import { useAuth } from "@/store/Auth";
+import { IMessage, IFormInput, IMessageFromAPI } from "@/types/types";
 import MessageService from "@/service/chat";
-import {IMessage, IFormInput, IMessageFromAPI} from "@/types/types";
-import {useAuth} from "@/store/Auth";
-import {io} from "socket.io-client";
 
 const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
 
 const MessagePage = () => {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const params = useParams();
   const friendId = Number(params.friendId);
   const [messages, setMessages] = useState<IMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const {register, handleSubmit, reset} = useForm<IFormInput>({
-    defaultValues: {message: ""},
+  const { register, handleSubmit, reset } = useForm<IFormInput>({
+    defaultValues: { message: "" },
   });
 
   const userId = user?.id;
@@ -27,52 +27,11 @@ const MessagePage = () => {
   const isUserAtBottom = () => {
     const container = messagesContainerRef.current;
     if (!container) return true;
-
     const threshold = 100;
-    const position = container.scrollHeight - container.scrollTop - container.clientHeight;
+    const position =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
     return position < threshold;
   };
-
-  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
-    messagesEndRef.current?.scrollIntoView({behavior});
-  };
-
-  useEffect(() => {
-    if (messages.length > 0 && isUserAtBottom()) {
-      setTimeout(() => scrollToBottom(), 100);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    socket.emit("joinRoom", userId);
-
-    socket.on("receiveMessage", (data) => {
-      if (data.receiverId === userId) {
-        console.log("Received message", data);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: data.id,
-            isMe: false,
-            text: data.message,
-            sender: data.sender,
-            createdAt: data.createdAt,
-          },
-        ]);
-      }
-    });
-
-    socket.on("messageSent", (data) => {
-      console.log("✅ Message sent:", data);
-    });
-
-    return () => {
-      socket.off("receiveMessage");
-      socket.off("messageSent");
-    };
-  }, [userId]);
 
   useEffect(() => {
     if (!userId || !friendId) return;
@@ -101,45 +60,87 @@ const MessagePage = () => {
     loadMessages();
   }, [userId, friendId]);
 
-  const sendMessage = async (data: IFormInput) => {
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  };
+
+  useEffect(() => {
+    if (messages.length > 0 && isUserAtBottom()) {
+      setTimeout(() => scrollToBottom(), 100);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    socket.emit("joinRoom", userId);
+
+    socket.on("receiveMessage", (data) => {
+      if (data.receiverId === userId) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: data.id,
+            isMe: false,
+            text: data.message,
+            sender: data.sender,
+            createdAt: data.createdAt,
+          },
+        ]);
+      }
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [userId]);
+
+  const onSubmit = (data: IFormInput) => {
     if (!userId || !friendId || !data.message.trim()) return;
 
-    try {
-      const response = await MessageService.send(userId, friendId, data.message);
-      const newMsg = response as unknown as IMessageFromAPI;
+    const messageData = {
+      senderId: userId,
+      receiverId: friendId,
+      message: data.message,
+      createdAt: new Date(),
+    };
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newMsg.id,
-          isMe: true,
-          text: newMsg.message,
-          sender: newMsg.sender,
-          createdAt: newMsg.createdAt,
+    socket.emit("sendMessage", messageData);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        isMe: true,
+        text: data.message,
+        sender: {
+          id: user.id,
+          firstName: user?.firstName,
+          lastName: user?.lastName,
+          coverPhoto: user?.coverPhoto || null,
         },
-      ]);
+        createdAt: messageData.createdAt.toISOString(),
+      },
+    ]);
 
-      reset();
-    } catch (err) {
-      console.error("Error sending message", err);
-    }
+    reset();
   };
 
   if (!userId || !friendId) return <p>Loading...</p>;
-  console.log("message", messages);
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <div className="p-4 bg-white shadow-md flex items-center gap-3">
         <h2 className="text-lg font-medium">Chat with Friend</h2>
       </div>
+
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"
       >
         {messages.map((msg) => (
           <div
-            key={msg.id}
+            key={Math.random().toString()}
             className={`flex ${msg.isMe ? "justify-end" : "justify-start"} items-end gap-2`}
           >
             {!msg.isMe && msg.sender && (
@@ -150,8 +151,7 @@ const MessagePage = () => {
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
-                <div
-                  className="w-8 h-8 rounded-full p-6 flex items-center justify-center text-white font-bold text-xl bg-black">
+                <div className="w-8 h-8 rounded-full p-2 flex items-center justify-center text-white font-bold text-xl bg-black">
                   {msg.sender.firstName?.[0]}
                   {msg.sender.lastName?.[0]}
                 </div>
@@ -167,18 +167,19 @@ const MessagePage = () => {
             >
               <div>{msg.text}</div>
               <div className="text-xs text-gray-400 mt-1">
-                <span className="text-xs text-gray-400">
-                  {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
-                </span>
+                {new Date(msg.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </div>
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef}/>
+        <div ref={messagesEndRef} />
       </div>
 
       <form
-        onSubmit={handleSubmit(sendMessage)}
+        onSubmit={handleSubmit(onSubmit)}
         className="p-4 bg-white flex gap-2 shadow-md"
       >
         <input
